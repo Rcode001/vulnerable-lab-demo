@@ -1,0 +1,41 @@
+import os
+import sqlite3
+from flask import Flask, request, render_template_string
+
+app = Flask(__name__)
+
+# FIX 1: Load sensitive credentials from environment variables instead of hardcoding
+API_KEY = os.environ.get("API_KEY", "fallback_default_secure_key_for_local_dev")
+
+@app.route("/")
+def home():
+    return "Welcome to the Security Playground! Check the routes."
+
+# FIX 2: Prevent Reflected XSS by using Jinja2 context variables for auto-escaping
+@app.route("/greet")
+def greet():
+    username = request.args.get("name", "Guest")
+    # Passing the variable into the context ensures special HTML characters are escaped
+    template = "<h1>Hello, {{ username }}!</h1>"
+    return render_template_string(template, username=username)
+
+# FIX 3: Prevent SQL Injection by using parameterized queries (placeholders)
+@app.route("/search")
+def search():
+    query = request.args.get("q", "")
+    
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE items (name TEXT)")
+    cursor.execute("INSERT INTO items VALUES ('Flag{example_flag}')")
+    
+    # Use '?' as a placeholder and pass user input as a tuple argument
+    sql = "SELECT * FROM items WHERE name = ?"
+    result = cursor.execute(sql, (query,)).fetchall()
+    
+    conn.close()
+    return str(result)
+
+if __name__ == "__main__":
+    # In production, ensure debug=False to avoid arbitrary code execution vulnerabilities
+    app.run(debug=True, port=5000)
