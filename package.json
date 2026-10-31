@@ -1,0 +1,10 @@
+{
+  "name": "vulnerable-node-lab",
+  "version": "1.0.0",
+  "description": "A test node project with missing dependencies and security flaws",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {}
+}
